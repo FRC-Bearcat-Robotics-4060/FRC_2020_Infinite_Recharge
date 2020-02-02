@@ -1,0 +1,8 @@
+Can Spark Max:
+https://www.revrobotics.com/content/sw/max/sdk/REVRobotics.json
+
+Phoenix Talons:
+ http://devsite.ctr-electronics.com/maven/release/com/ctre/phoenix/Phoenix-latest.json
+
+ KLabs NavX:
+ https://www.kauailabs.com/dist/frc/2020/navx_frc.json
