@@ -34,13 +34,13 @@ public class Robot extends TimedRobot {
   
   AHRS navx;
   Joystick _joystick1 = new Joystick(0);
-  CANSparkMax _leftBackCanSparkMax = new CANSparkMax((13), MotorType.kBrushless);
+  CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
 
-  CANSparkMax _leftFrontCanSparkMax = new CANSparkMax((12), MotorType.kBrushless);
+  CANSparkMax _leftFrontCanSparkMax = new CANSparkMax((4), MotorType.kBrushless);
 
-  CANSparkMax _rightBackCanSparkMax = new CANSparkMax((14), MotorType.kBrushless);
+  CANSparkMax _rightBackCanSparkMax = new CANSparkMax((2), MotorType.kBrushless);
 
-  CANSparkMax _rightFrontCanSparkMax = new CANSparkMax((11), MotorType.kBrushless); 
+  CANSparkMax _rightFrontCanSparkMax = new CANSparkMax((3), MotorType.kBrushless); 
   
   private SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(_leftBackCanSparkMax, _leftFrontCanSparkMax);
   private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
@@ -211,10 +211,10 @@ else if (speedToggle == true && lightspeed == false) {
   m_Drive.tankDrive(drive_left * 2, drive_right * 2);
 }
 
-// else if (lightspeed == true) {
-//   m_Drive.tankDrive(drive_left * 3, drive_right * 3);
+else if (lightspeed == true) {
+  m_Drive.tankDrive(drive_left * 0.3, drive_right * 0.3);
 
-// }
+}
 
  else {
   ledEntry.setDouble(1);
