@@ -1,5 +1,11 @@
 <xml version="1.0">
 <dashboard>
+	<widget field="Joy1" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="82"/>
+	</widget>
+	<widget field="Joy2" type="Boolean" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
+		<location x="0" y="62"/>
+	</widget>
 	<widget field="Right Encoder" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="971" y="21"/>
 	</widget>
@@ -29,10 +35,14 @@
 		<location x="1214" y="208"/>
 	</widget>
 	<widget field="Right Drive" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="84"/>
+		<location x="642" y="617"/>
+		<width>262</width>
+		<height>42</height>
 	</widget>
 	<widget field="Left Drive" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
-		<location x="0" y="63"/>
+		<location x="652" y="562"/>
+		<width>236</width>
+		<height>56</height>
 	</widget>
 	<widget field="Displacement_Y" type="Number" class="edu.wpi.first.smartdashboard.gui.elements.TextBox">
 		<location x="175" y="189"/>

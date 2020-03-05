@@ -7,6 +7,8 @@
 
 package frc.robot;
 
+import com.ctre.phoenix.motorcontrol.ControlMode;
+import com.ctre.phoenix.motorcontrol.can.TalonSRX;
 import com.kauailabs.navx.frc.AHRS;
 import com.revrobotics.CANEncoder;
 import com.revrobotics.CANSparkMax;
@@ -20,13 +22,17 @@ import com.revrobotics.CANSparkMaxLowLevel.MotorType;
 import edu.wpi.first.cameraserver.CameraServer;
 import edu.wpi.first.networktables.NetworkTableEntry;
 import edu.wpi.first.networktables.NetworkTableInstance;
+import edu.wpi.first.wpilibj.DigitalInput;
 import edu.wpi.first.wpilibj.DriverStation;
 import edu.wpi.first.wpilibj.I2C;
 import edu.wpi.first.wpilibj.SPI;
+import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.livewindow.LiveWindow;
+import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj.util.Color;
 //import frc.robot.imports.*;
@@ -40,12 +46,34 @@ public class Robot extends TimedRobot {
 
   CANSparkMax _rightBackCanSparkMax = new CANSparkMax((2), MotorType.kBrushless);
 
+
   CANSparkMax _rightFrontCanSparkMax = new CANSparkMax((3), MotorType.kBrushless); 
+
+
+  CANSparkMax _collectVert = new CANSparkMax((13), MotorType.kBrushless);
+
+  CANSparkMax _shooterMotorLeft = new CANSparkMax((14), MotorType.kBrushless);
+
+  CANSparkMax _shooterMotorRight = new CANSparkMax((15), MotorType.kBrushless); 
+
+  //CANSparkMax _miscSpark = new CANSparkMax((null), MotorType.kBrushless);
   
   private SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(_leftBackCanSparkMax, _leftFrontCanSparkMax);
   private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
  
   private DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
+
+  TalonSRX _colorWheelTalon = new TalonSRX(10);
+
+  TalonSRX _ColectorMotor = new TalonSRX(11);
+
+  TalonSRX _liftmotor = new TalonSRX(12);
+
+  Spark _magMotor1 = new Spark(0);
+
+
+  Spark _magMotor2 = new Spark(1);
+  
 
 
 
@@ -108,9 +136,9 @@ public class Robot extends TimedRobot {
     navx.enableLogging(true);
 } catch (RuntimeException ex ) {
     DriverStation.reportError("Error instantiating navX-MXP:  " + ex.getMessage(), true);
-}
 
   }
+}
 
   @Override
   public void robotPeriodic() {
@@ -133,18 +161,24 @@ public class Robot extends TimedRobot {
 
     Color detectedColor = m_colorSensor.getColor();
     String colorString;
+    String fieldColor;
     ColorMatchResult match = m_colorMatcher.matchClosestColor(detectedColor);
 
     if (match.color == kBlueTarget) {
       colorString = "Blue";
+      fieldColor = "Red";
     } else if (match.color == kRedTarget) {
       colorString = "Red";
+      fieldColor = "Blue";
     } else if (match.color == kGreenTarget) {
       colorString = "Green";
+      fieldColor = "Yellow";
     } else if (match.color == kYellowTarget) {
       colorString = "Yellow";
+      fieldColor = "Green";
     } else {
       colorString = "Unknown";
+      fieldColor = "IDunno";
     }
 
     /**
@@ -156,10 +190,22 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Blue", detectedColor.blue);
     SmartDashboard.putNumber("Confidence", match.confidence);
     SmartDashboard.putString("Detected Color", colorString);
+    SmartDashboard.putString("Field Color", fieldColor);
 
     SmartDashboard.putNumber("Joystick Forward", -_joystick1.getY());
     SmartDashboard.putNumber("Robot Forward", _leftFrontCanSparkMax.getAppliedOutput());
+  
+    
+  
+  
+  
   }
+
+
+
+
+
+
 
   @Override 
   public void teleopInit() {
@@ -170,6 +216,7 @@ public class Robot extends TimedRobot {
     ledEntry.setDouble(1);
 
     camMode.setDouble(1);
+
  
   }
 
@@ -180,15 +227,29 @@ public class Robot extends TimedRobot {
 public void teleopPeriodic() {
   buttonToggles();
 
+  double collectorSpeed = -_joystick1.getRawAxis(3);
 
-
+  double deadzone = 0.3;
 
   double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
   
   double _joyforwardRaw = -_joystick1.getZ();
-  double _joyrotateRaw = -_joystick1.getY();
+  double _joyrotateRaw = -_joystick1.getY() ;
 
-    double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
+
+  double _joyforward ;
+  double _joyrotate ;
+
+  if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
+     _joyforward = _joyforwardRaw;
+   }
+  
+
+   if (_joyrotateRaw > deadzone || _joyrotateRaw < -deadzone) {
+    _joyrotate = _joyrotateRaw;
+  }
+
+  double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
       double rotate2 = _joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -0.8 : 0.8);
 
       double forwardPower = 0.33 * Math.abs(forward2) >= 0.1 ? forward2 : 0;
@@ -208,11 +269,11 @@ limelightAutonomous();
  }
 
 else if (speedToggle == true && lightspeed == false) {
-  m_Drive.tankDrive(drive_left * 2, drive_right * 2);
+  m_Drive.tankDrive(drive_left * 1.7, drive_right * 1.7);
 }
 
 else if (lightspeed == true) {
-  m_Drive.tankDrive(drive_left * 0.3, drive_right * 0.3);
+  //m_Drive.tankDrive(drive_left * 3, drive_right * 3);
 
 }
 
@@ -223,12 +284,74 @@ else if (lightspeed == true) {
 m_Drive.tankDrive(drive_left * 1.3, drive_right * 1.3);
  }
       
+if (_joystick1.getRawButton(4)) {
+_liftmotor.set(ControlMode.PercentOutput, 0.4);
+
+_liftmotor.set(ControlMode.PercentOutput, -0.4);
+}
+else if (_joystick1.getRawButton(6)) {
+
+  _liftmotor.set(ControlMode.PercentOutput, -0.4);
+
+  _liftmotor.set(ControlMode.PercentOutput, 0.4);
+}
+else {
+
+  _liftmotor.set(ControlMode.PercentOutput, 0);
+
+  _liftmotor.set(ControlMode.PercentOutput, 0);
+}
+
+if (_joystick1.getRawButton(1)) {
+
+
+_ColectorMotor.set(ControlMode.PercentOutput, -0.75);
+
+
+
+
+_collectVert.set(-0.95);
+
+_magMotor1.set(1);
+_magMotor2.set(-1);
+
+_shooterMotorLeft.set(0.90);
+_shooterMotorRight.set(-0.90);
+
 
 }
-    
-     
+else {
   
+  _ColectorMotor.set(ControlMode.PercentOutput, 0);
+
+  _magMotor1.set(0);
+  _magMotor2.set(0);
+
+  _collectVert.set(0);
+  _shooterMotorLeft.set(0);
+  _shooterMotorRight.set(0);
   
+}
+
+
+if (_joystick1.getRawButton(5)) {
+  _colorWheelTalon.set(ControlMode.PercentOutput, 1);
+}
+ 
+else if (_joystick1.getRawButton(3)) {
+  _colorWheelTalon.set(ControlMode.PercentOutput, -1);
+}   
+
+else {
+
+  _colorWheelTalon.set(ControlMode.PercentOutput, 0);
+}
+
+
+
+}     
+  
+
 
 
 
@@ -313,6 +436,37 @@ public void limelightAutonomous() {
 
 }
 
+public void limelightShooter() {
+  Update_Limelight_Tracking();
+  ledEntry.setDouble(3);
+  camMode.setDouble(0);
+    
+    boolean auto = false;//_joystick1.getRawButton(8);
+
+    
+
+    if (!auto) {
+      if (m_LimelightHasValidTarget) {
+       //_miscSpark.set()
+       System.out.println("Drive" + -m_LimelightDriveCommand);
+
+        System.out.println("Steer" + -m_LimelightSteerCommand);
+      }
+
+      else if (_tavar > 3.0) {
+        
+       
+
+      } else {
+        
+      }
+
+    } else {
+      
+    }
+
+}
+
 public void buttonToggles() {
 int speedbutton = 2;
 
@@ -327,7 +481,7 @@ if (!speedToggle) {
     }
 
 if (_joystick1.getTrigger() ) {
- lightspeed = true;
+ //lightspeed = true;
   // if (!lightspeed) {
   // lightspeed = true;
   // } 
