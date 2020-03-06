@@ -218,7 +218,7 @@ myTimer.start();
    // m_Drive.tankDrive(0.6, 0.6);
    // If is has been less than 2 seconds since autonomous started, drive forwards
    if(myTimer.get() < 1.0){
-    m_Drive.tankDrive(0.3, 0.3);
+    m_Drive.tankDrive(0.9, 0.9);
 }
 
 // If more than 2 seconds have elapsed, stop driving and turn off the timer
@@ -292,15 +292,15 @@ public void teleopPeriodic() {
 limelightAutonomous();
  }
 
-else if (speedToggle == true && lightspeed == false) {
-  m_Drive.tankDrive(drive_left * 1.7, drive_right * 1.7);
+else if (speedToggle == true) {
+  m_Drive.tankDrive(drive_left * 1.8, drive_right * 1.8);
 }
 
 
 
  else {
  
-m_Drive.tankDrive(drive_left * 1.3, drive_right * 1.3);
+m_Drive.tankDrive(drive_left * 1.5, drive_right * 1.5);
  }
       
 
@@ -521,8 +521,14 @@ public void Update_Limelight_Tracking() {
 
 public void limelightAutonomous() {
   Update_Limelight_Tracking();
-  ledEntry.setDouble(3);
+  if (_joystick1.getRawButton(3)) {
+    ledEntry.setDouble(3);
   camMode.setDouble(0);
+  }
+  else {
+    ledEntry.setDouble(1);
+  camMode.setDouble(1);
+  }
     double steer = _joystick1.getZ();
     double drive = _joystick1.getY();
     boolean auto = false;//_joystick1.getRawButton(8);
@@ -596,24 +602,11 @@ if (!speedToggle) {
       }
     }
 
-if (_joystick1.getTrigger() ) {
- //lightspeed = true;
-  // if (!lightspeed) {
-  // lightspeed = true;
-  // } 
-  //   else if (lightspeed) {
-  //     lightspeed = false;
-  //       }
-
-  //     }
-}
-else {
-  lightspeed = false;
-}
-
-
 
 }
+
+
+
 
 public void navxReadout() {
   SmartDashboard.putBoolean(  "IMU_Connected",        navx.isConnected());
