@@ -218,7 +218,7 @@ myTimer.start();
    // m_Drive.tankDrive(0.6, 0.6);
    // If is has been less than 2 seconds since autonomous started, drive forwards
    if(myTimer.get() < 1.0){
-    m_Drive.tankDrive(0.9, 0.9);
+    m_Drive.tankDrive(0.6, 0.6);
 }
 
 // If more than 2 seconds have elapsed, stop driving and turn off the timer
@@ -342,11 +342,11 @@ if (collectorButton) {
   collectorOn(true, false);
 
 }
-if (magazineAll_co) {
+// if (magazineAll_co) {
 
- magazine_indv(1, -1);
+//  magazine_indv(1, -1);
 
-}
+// }
 if (bottom_mag_co) {
 
   magazine_indv(-1, 0);
@@ -359,12 +359,8 @@ if (topMag_co) {
   magazine_indv(0, 1);
 
 }
-else if (maindriver_trigger && mainDriver_thumbButton) {
+if (maindriver_trigger && mainDriver_thumbButton) {
   shooter(90);
-
-_collectVert.set(0);
-_ColectorMotor.set(ControlMode.PercentOutput, 0);
-magazine_indv(0, 0);
 }
 
 else {
@@ -393,26 +389,21 @@ else if (collectorDirection < -0.1) {
     collectorOn(true, true);
     
     }
-    if (magazineAll_co) {
+    // if (magazineAll_co) {
     
-     _magMotor1.set(-1);
-     _magMotor2.set(1);
-    }
+    //  _magMotor1.set(1);
+    //  _magMotor2.set(-1);
+    // }
     if (bottom_mag_co) {
-      _magMotor1.set(-1);
+      magazine_indv(1, 0);
     }
     
     if (topMag_co) {
-      _magMotor2.set(1);
+      magazine_indv(0, -1);
     }
     if (maindriver_trigger && mainDriver_thumbButton) {
       _shooterMotorLeft.set(-90);
     _shooterMotorRight.set(90);
-    
-    _collectVert.set(0);
-    _ColectorMotor.set(ControlMode.PercentOutput, 0);
-    _magMotor1.set(0);
-    _magMotor2.set(0);
     }
     
     else {
