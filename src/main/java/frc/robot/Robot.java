@@ -39,9 +39,13 @@ import edu.wpi.first.wpilibj.util.Color;
 public class Robot extends TimedRobot {
   
   AHRS navx;
+
   Joystick _joystick1 = new Joystick(0);
 
   Joystick _joystickco = new Joystick(1);
+
+//Joystick Buttons -
+
 
   CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
 
@@ -79,8 +83,6 @@ public class Robot extends TimedRobot {
   
 
 
-
-  Boolean directionFlipped = false;
   Boolean button12Toggle = false;
   Boolean button11Toggle = false;
   Boolean speedToggle = false;
@@ -197,14 +199,17 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Joystick Forward", -_joystick1.getY());
     SmartDashboard.putNumber("Robot Forward", _leftFrontCanSparkMax.getAppliedOutput());
-  
-    
-  
-  
-  
+  }
+@Override
+  public void autonomousInit() {
+    teleopInit(); 
+
   }
 
-
+  @Override
+  public void autonomousPeriodic() {
+   // m_Drive.tankDrive(0.6, 0.6);
+  }
 
 
 
@@ -212,13 +217,11 @@ public class Robot extends TimedRobot {
 
   @Override 
   public void teleopInit() {
-    directionFlipped = true;
+    
     speedToggle = false;
     Update_Limelight_Tracking();
 
-    ledEntry.setDouble(1);
-
-    camMode.setDouble(1);
+    limelightTracking(false);
 
  
   }
@@ -242,6 +245,7 @@ public void teleopPeriodic() {
 
   double _joyforward ;
   double _joyrotate ;
+
 
   if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
      _joyforward = _joyforwardRaw;
@@ -275,18 +279,14 @@ else if (speedToggle == true && lightspeed == false) {
   m_Drive.tankDrive(drive_left * 1.7, drive_right * 1.7);
 }
 
-else if (lightspeed == true) {
-  //m_Drive.tankDrive(drive_left * 3, drive_right * 3);
 
-}
 
  else {
-  ledEntry.setDouble(1);
-
-  camMode.setDouble(1);
+ 
 m_Drive.tankDrive(drive_left * 1.3, drive_right * 1.3);
  }
       
+
 if (_joystick1.getRawButton(4)) {
 _liftmotor.set(ControlMode.PercentOutput, 0.4);
 
@@ -313,35 +313,41 @@ else {
 //Trigger = Collector 
 //Direction 
 //Down
+boolean collectorButton = _joystickco.getRawButton(1);
+boolean magazineAll_co = _joystickco.getRawButton(3);
+boolean bottom_mag_co = _joystickco.getRawButton(5);
+boolean topMag_co = _joystickco.getRawButton(6);
+boolean maindriver_trigger = _joystick1.getRawButton(1);
+boolean mainDriver_thumbButton = _joystick1.getRawButton(2);
 if (collectorDirection > 0.1) {
+if (collectorButton) {
 
-
-if (_joystickco.getRawButton(5)) {
-
-
-_ColectorMotor.set(ControlMode.PercentOutput, -0.75);
-
-
-
-
-_collectVert.set(-0.95);
+  collectorOn(true, false);
 
 }
-else if (_joystickco.getRawButton(6)) {
+if (magazineAll_co) {
 
- _magMotor1.set(1);
- _magMotor2.set(-1);
+ magazine_indv(1, -1);
+
+}
+if (bottom_mag_co) {
+
+  magazine_indv(-1, 0);
+
 }
 
 
-else if (_joystick1.getRawButton(1) && _joystick1.getRawButton(2)) {
-  _shooterMotorLeft.set(0);
-_shooterMotorRight.set(0);
+if (topMag_co) {
+
+  magazine_indv(0, 1);
+
+}
+else if (maindriver_trigger && mainDriver_thumbButton) {
+  shooter(90);
 
 _collectVert.set(0);
 _ColectorMotor.set(ControlMode.PercentOutput, 0);
-_magMotor1.set(0);
-_magMotor2.set(0);
+magazine_indv(0, 0);
 }
 
 else {
@@ -364,28 +370,50 @@ _collectVert.set(0);
 else if (collectorDirection < -0.1) {
 
 
-  if (_joystickco.getRawButton(5)) {
-  
-  _ColectorMotor.set(ControlMode.PercentOutput, 0.75);
-  
-  _collectVert.set(0.95);
-  }
-  else if (_joystickco.getRawButton(6)) {
-  
-   _magMotor1.set(-1);
-   _magMotor2.set(1);
-  }
+  if (collectorButton) {
 
- else if (_joystick1.getRawButton(1) && _joystick1.getRawButton(2)) {
-    _shooterMotorLeft.set(-0.75);
-  _shooterMotorRight.set(0.75);
-_collectVert.set(0);
-  _magMotor1.set(0);
-  _magMotor2.set(0);
-  _ColectorMotor.set(ControlMode.PercentOutput, 0);
+
+    collectorOn(true, true);
+    
+    }
+    if (magazineAll_co) {
+    
+     _magMotor1.set(-1);
+     _magMotor2.set(1);
+    }
+    if (bottom_mag_co) {
+      _magMotor1.set(-1);
+    }
+    
+    if (topMag_co) {
+      _magMotor2.set(1);
+    }
+    if (maindriver_trigger && mainDriver_thumbButton) {
+      _shooterMotorLeft.set(-90);
+    _shooterMotorRight.set(90);
+    
+    _collectVert.set(0);
+    _ColectorMotor.set(ControlMode.PercentOutput, 0);
+    _magMotor1.set(0);
+    _magMotor2.set(0);
+    }
+    
+    else {
+      
+      _ColectorMotor.set(ControlMode.PercentOutput, 0);
+    _collectVert.set(0);
+    
+      _magMotor1.set(0);
+      _magMotor2.set(0);
+    
+      _collectVert.set(0);
+      _shooterMotorLeft.set(0);
+      _shooterMotorRight.set(0);
+      
+    }
   }
   else {
-    
+      
     _ColectorMotor.set(ControlMode.PercentOutput, 0);
   _collectVert.set(0);
   
@@ -396,8 +424,6 @@ _collectVert.set(0);
     _shooterMotorLeft.set(0);
     _shooterMotorRight.set(0);
     
-  }
-  }
 
 
 
@@ -539,7 +565,7 @@ public void limelightShooter() {
 }
 
 public void buttonToggles() {
-int speedbutton = 2;
+int speedbutton = 11;
 
   if (_joystick1.getRawButtonPressed(speedbutton)) {
 
@@ -648,5 +674,69 @@ public void navxReadout() {
           SmartDashboard.putNumber(   "IMU_Byte_Count",       navx.getByteCount());
           SmartDashboard.putNumber(   "IMU_Update_Count",     navx.getUpdateCount());
 }
+
+//Basic Motor Functions, temp until subsystems and commands
+
+public void shooter(double Power_Positive) {
+  _shooterMotorLeft.set(Power_Positive);
+  _shooterMotorRight.set(-Power_Positive);
 }
+
+public void magazine_indv(double bottom_power, double top_power) {
+  _magMotor1.set(bottom_power);
+      _magMotor2.set(top_power);
+}
+
+public void collectorOn(boolean Active, boolean Direction) {
+  //false is normal, true is reversed.
+if (Active) {
+if (!Direction) {
+  _ColectorMotor.set(ControlMode.PercentOutput, -0.75);
+  _collectVert.set(-0.95);
+  
+}
+else if (Direction) {
+  _ColectorMotor.set(ControlMode.PercentOutput, 0.75);
+  _collectVert.set(0.95);
+}
+else {
+  _ColectorMotor.set(ControlMode.PercentOutput, 0);
+    _collectVert.set(0);
+}
+}
+else {
+  _ColectorMotor.set(ControlMode.PercentOutput, 0);
+    _collectVert.set(0);
+}
+}
+
+public void limelightTracking(boolean isTracking) {
+  if (!isTracking) {
+    ledEntry.setDouble(1);
+    camMode.setDouble(1);
+  }
+  else { 
+    ledEntry.setDouble(3);
+
+    camMode.setDouble(0);}
+}
+
+//Put on smartdashboard
+public void smartdashboardUpdate() {
+  
+}
+
+//Encoder Math
+//42 Ticks Per Rev. 
+
+
+
+
+
+
+
+
+
+}
+
 
