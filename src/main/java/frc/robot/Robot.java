@@ -230,7 +230,7 @@ public class Robot extends TimedRobot {
 public void teleopPeriodic() {
   buttonToggles();
 
-  double collectorDirection = -_joystickco.getRawAxis(3);
+  double collectorDirection = -_joystick1.getRawAxis(3);
 
   double deadzone = 0.3;
 
@@ -316,7 +316,7 @@ else {
 if (collectorDirection > 0.1) {
 
 
-if (_joystickco.getRawButton(1) && !_joystickco.getRawButton(2)) {
+if (_joystickco.getRawButton(5)) {
 
 
 _ColectorMotor.set(ControlMode.PercentOutput, -0.75);
@@ -327,15 +327,16 @@ _ColectorMotor.set(ControlMode.PercentOutput, -0.75);
 _collectVert.set(-0.95);
 
 }
-else if (!_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
+else if (_joystickco.getRawButton(6)) {
 
  _magMotor1.set(1);
  _magMotor2.set(-1);
 }
 
-else if (_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
-  _shooterMotorLeft.set(0.90);
-_shooterMotorRight.set(-0.90);
+
+else if (_joystick1.getRawButton(1) && _joystick1.getRawButton(2)) {
+  _shooterMotorLeft.set(0);
+_shooterMotorRight.set(0);
 
 _collectVert.set(0);
 _ColectorMotor.set(ControlMode.PercentOutput, 0);
@@ -363,19 +364,19 @@ _collectVert.set(0);
 else if (collectorDirection < -0.1) {
 
 
-  if (_joystickco.getRawButton(1) && !_joystickco.getRawButton(2)) {
+  if (_joystickco.getRawButton(5)) {
   
   _ColectorMotor.set(ControlMode.PercentOutput, 0.75);
   
   _collectVert.set(0.95);
   }
-  else if (!_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
+  else if (_joystickco.getRawButton(6)) {
   
    _magMotor1.set(-1);
    _magMotor2.set(1);
   }
 
- else if (_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
+ else if (_joystick1.getRawButton(1) && _joystick1.getRawButton(2)) {
     _shooterMotorLeft.set(-0.75);
   _shooterMotorRight.set(0.75);
 _collectVert.set(0);
