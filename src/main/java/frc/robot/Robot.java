@@ -30,6 +30,7 @@ import edu.wpi.first.wpilibj.Spark;
 import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.SpeedControllerGroup;
 import edu.wpi.first.wpilibj.TimedRobot;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.drive.DifferentialDrive;
 import edu.wpi.first.wpilibj.livewindow.LiveWindow;
 import edu.wpi.first.wpilibj.smartdashboard.SendableChooser;
@@ -200,15 +201,31 @@ public class Robot extends TimedRobot {
     SmartDashboard.putNumber("Joystick Forward", -_joystick1.getY());
     SmartDashboard.putNumber("Robot Forward", _leftFrontCanSparkMax.getAppliedOutput());
   }
+  Timer myTimer = new Timer();
 @Override
   public void autonomousInit() {
     teleopInit(); 
+    
+    // Reset timer to 0sec
+myTimer.reset();
 
+// Start timer
+myTimer.start();
   }
 
   @Override
   public void autonomousPeriodic() {
    // m_Drive.tankDrive(0.6, 0.6);
+   // If is has been less than 2 seconds since autonomous started, drive forwards
+   if(myTimer.get() < 1.0){
+    m_Drive.tankDrive(0.3, 0.3);
+}
+
+// If more than 2 seconds have elapsed, stop driving and turn off the timer
+else {
+  m_Drive.tankDrive(0, 0);
+    myTimer.stop();
+}
   }
 
 
