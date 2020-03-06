@@ -40,6 +40,9 @@ public class Robot extends TimedRobot {
   
   AHRS navx;
   Joystick _joystick1 = new Joystick(0);
+
+  Joystick _joystickco = new Joystick(1);
+
   CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
 
   CANSparkMax _leftFrontCanSparkMax = new CANSparkMax((4), MotorType.kBrushless);
@@ -227,7 +230,7 @@ public class Robot extends TimedRobot {
 public void teleopPeriodic() {
   buttonToggles();
 
-  double collectorDirection = -_joystick1.getRawAxis(3);
+  double collectorDirection = -_joystickco.getRawAxis(3);
 
   double deadzone = 0.3;
 
@@ -313,7 +316,7 @@ else {
 if (collectorDirection > 0.1) {
 
 
-if (_joystick1.getRawButton(1)) {
+if (_joystickco.getRawButton(1) && !_joystickco.getRawButton(2)) {
 
 
 _ColectorMotor.set(ControlMode.PercentOutput, -0.75);
@@ -323,27 +326,27 @@ _ColectorMotor.set(ControlMode.PercentOutput, -0.75);
 
 _collectVert.set(-0.95);
 
-// _magMotor1.set(1);
-// _magMotor2.set(-1);
-
-// _shooterMotorLeft.set(0.90);
-// _shooterMotorRight.set(-0.90);
-
-
 }
-else if (_joystick1.getRawButton(2)) {
+else if (!_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
 
  _magMotor1.set(1);
  _magMotor2.set(-1);
 }
-else if (_joystick1.getRawButton(1) && _joystick1.getRawButton(2)) {
+
+else if (_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
   _shooterMotorLeft.set(0.90);
 _shooterMotorRight.set(-0.90);
 
+_collectVert.set(0);
+_ColectorMotor.set(ControlMode.PercentOutput, 0);
+_magMotor1.set(0);
+_magMotor2.set(0);
 }
+
 else {
   
   _ColectorMotor.set(ControlMode.PercentOutput, 0);
+_collectVert.set(0);
 
   _magMotor1.set(0);
   _magMotor2.set(0);
@@ -360,32 +363,30 @@ else {
 else if (collectorDirection < -0.1) {
 
 
-  if (_joystick1.getRawButton(1)) {
-  
+  if (_joystickco.getRawButton(1) && !_joystickco.getRawButton(2)) {
   
   _ColectorMotor.set(ControlMode.PercentOutput, 0.75);
   
-  
-  
-  
   _collectVert.set(0.95);
-  
-  
-  
   }
-  else if (_joystick1.getRawButton(2)) {
+  else if (!_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
   
    _magMotor1.set(-1);
    _magMotor2.set(1);
   }
-  else if (_joystick1.getRawButton(1) && _joystick1.getRawButton(2)) {
+
+ else if (_joystickco.getRawButton(1) && _joystickco.getRawButton(2)) {
     _shooterMotorLeft.set(-0.75);
   _shooterMotorRight.set(0.75);
-  
+_collectVert.set(0);
+  _magMotor1.set(0);
+  _magMotor2.set(0);
+  _ColectorMotor.set(ControlMode.PercentOutput, 0);
   }
   else {
     
     _ColectorMotor.set(ControlMode.PercentOutput, 0);
+  _collectVert.set(0);
   
     _magMotor1.set(0);
     _magMotor2.set(0);
