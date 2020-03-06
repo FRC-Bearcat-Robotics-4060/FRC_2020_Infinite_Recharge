@@ -442,11 +442,13 @@ else if (_joystick1.getRawButton(3)) {
 else {
 
   _colorWheelTalon.set(ControlMode.PercentOutput, 0);
+
+}
+}
 }
 
 
-
-}     
+   
   
 
 
@@ -728,15 +730,6 @@ public void smartdashboardUpdate() {
 
 //Encoder Math
 //42 Ticks Per Rev. 
-
-
-
-
-
-
-
-
-
-}
+  }
 
 
