@@ -269,33 +269,14 @@ public class Robot extends TimedRobot {
 
     m_Drive.arcadeDrive(forward2, rotate2, false);
 
-    // if (_joystick1.getRawButton(4)) {
-    // _liftmotor.set(ControlMode.PercentOutput, 0.4);
-
-    // _liftmotor.set(ControlMode.PercentOutput, -0.4);
-    // } else if (_joystick1.getRawButton(6)) {
-
-    // _liftmotor.set(ControlMode.PercentOutput, -0.4);
-
-    // _liftmotor.set(ControlMode.PercentOutput, 0.4);
-    // } else {
-
-    // _liftmotor.set(ControlMode.PercentOutput, 0);
-
-    // _liftmotor.set(ControlMode.PercentOutput, 0);
-    // }
-
     // Lifting
     Boolean liftUp = _joystick1.getRawButton(4);
     Boolean liftDown = _joystick1.getRawButton(6);
-    double lifterDir = liftDown ? -1 : 1;
-    double liftingDirection = (liftDown ^ liftUp) ? lifterDir : 0.0;
+    double lifterDir = liftDown ? 1 : -1;
     // If you press liftDown or liftUp at the same time, or neither at the same
     // time, set lifting diretion to 0.
 
-    // final double liftingDirection = liftDown ? -1 : 1;
-    Boolean isLifterMoving = liftDown || liftUp;
-    _liftmotor.set(ControlMode.PercentOutput, isLifterMoving ? 0.4 * liftingDirection : 0);
+    _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4 * lifterDir) : 0.0);
 
     // For gathering
     // Read current from powerboard for shooter
