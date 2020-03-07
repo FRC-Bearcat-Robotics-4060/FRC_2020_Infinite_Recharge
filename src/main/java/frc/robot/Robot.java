@@ -256,12 +256,6 @@ public class Robot extends TimedRobot {
     double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
     double rotate2 = _joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0);
 
-    // double forwardPower = 0.33 * Math.abs(forward2) >= 0.1 ? forward2 : 0;
-    // double rotatePower = 0.33 * Math.abs(rotate2) >= 0.1 ? rotate2 : 0;
-
-    // double drive_left = (rotatePower - forwardPower) / 3;
-    // double drive_right = (rotatePower + forwardPower) / 3;
-
     // SmartDashboard.putNumber("Left Drive", drive_left);
 
     // SmartDashboard.putNumber("Right Drive", drive_right);
@@ -271,14 +265,6 @@ public class Robot extends TimedRobot {
     }
 
     m_Drive.arcadeDrive(forward2, rotate2, false);
-    // else if (speedToggle == true) {
-    //   m_Drive.tankDrive(drive_left * 1.8, drive_right * 1.8);
-    // }
-
-    // else {
-
-    //   m_Drive.tankDrive(drive_left * 1.5, drive_right * 1.5);
-    // }
 
     if (_joystick1.getRawButton(4)) {
       _liftmotor.set(ControlMode.PercentOutput, 0.4);
