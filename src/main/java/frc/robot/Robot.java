@@ -295,76 +295,21 @@ public class Robot extends TimedRobot {
     boolean topMag_co = _joystickco.getRawButton(6);
     boolean maindriver_trigger = _joystick1.getRawButton(1);
     boolean mainDriver_thumbButton = _joystick1.getRawButton(2);
-    if (collectorDirection > 0.1) {
-      if (collectorButton) {
 
-        collectorOn(true, false);
+    // -1 == Reverse direction of collector
+    double directionMultiplier = collectorDirection > 0.0 ? 1.0 : -1.0;
 
-      }
-      // if (magazineAll_co) {
+    collectorOn(collectorButton, collectorDirection < 0.0);
 
-      // magazine_indv(1, -1);
+    //If bottoom is false, then 0, if true, -1
+    _magMotor1.set(bottom_mag_co ? 1 * directionMultiplier : 0);
+    _magMotor2.set(topMag_co ? -1 * directionMultiplier : 0);
 
-      // }
-      if (bottom_mag_co) {
+    Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
+    final double shootPower = directionMultiplier * -0.9;
+    _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
+    _shooterMotorRight.set(isShooting ? shootPower : 0.0);
 
-        _magMotor1.set(1);
-
-      }
-
-      if (topMag_co) {
-
-        _magMotor2.set(-1);
-
-      }
-      if (maindriver_trigger && mainDriver_thumbButton) {
-        shooter(90);
-      }
-
-      else {
-
-        // _ColectorMotor.set(ControlMode.PercentOutput, 0);
-        // _collectVert.set(0);
-
-        // _magMotor1.set(0);
-        // _magMotor2.set(0);
-
-        // _collectVert.set(0);
-        // _shooterMotorLeft.set(0);
-        // _shooterMotorRight.set(0);
-
-      }
-
-    }
-
-    // Up
-    else if (collectorDirection < -0.1) {
-
-      if (collectorButton) {
-
-        collectorOn(true, true);
-
-      }
-
-      if (bottom_mag_co) {
-        _magMotor1.set(-1);
-
-      } else {
-        _magMotor1.set(0);
-
-      }
-
-      if (topMag_co) {
-        _magMotor2.set(1);
-      } else {
-        _magMotor2.set(1);
-      }
-      if (maindriver_trigger && mainDriver_thumbButton) {
-        _shooterMotorLeft.set(-90);
-        _shooterMotorRight.set(90);
-      }
-
-    } // Color Wheel
     if (_joystick1.getRawButton(5)) {
       _colorWheelTalon.set(ControlMode.PercentOutput, 1);
     }
