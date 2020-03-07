@@ -49,7 +49,6 @@ public class Robot extends TimedRobot {
   Timer shooterTimer = new Timer();
   Boolean wasShooting = false;
 
-
   // Joystick Buttons -
 
   CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
@@ -270,21 +269,33 @@ public class Robot extends TimedRobot {
 
     m_Drive.arcadeDrive(forward2, rotate2, false);
 
-    if (_joystick1.getRawButton(4)) {
-      _liftmotor.set(ControlMode.PercentOutput, 0.4);
+    // if (_joystick1.getRawButton(4)) {
+    // _liftmotor.set(ControlMode.PercentOutput, 0.4);
 
-      _liftmotor.set(ControlMode.PercentOutput, -0.4);
-    } else if (_joystick1.getRawButton(6)) {
+    // _liftmotor.set(ControlMode.PercentOutput, -0.4);
+    // } else if (_joystick1.getRawButton(6)) {
 
-      _liftmotor.set(ControlMode.PercentOutput, -0.4);
+    // _liftmotor.set(ControlMode.PercentOutput, -0.4);
 
-      _liftmotor.set(ControlMode.PercentOutput, 0.4);
-    } else {
+    // _liftmotor.set(ControlMode.PercentOutput, 0.4);
+    // } else {
 
-      _liftmotor.set(ControlMode.PercentOutput, 0);
+    // _liftmotor.set(ControlMode.PercentOutput, 0);
 
-      _liftmotor.set(ControlMode.PercentOutput, 0);
-    }
+    // _liftmotor.set(ControlMode.PercentOutput, 0);
+    // }
+
+    // Lifting
+    Boolean liftUp = _joystick1.getRawButton(4);
+    Boolean liftDown = _joystick1.getRawButton(6);
+    double lifterDir = liftDown ? -1 : 1;
+    double liftingDirection = (liftDown ^ liftUp) ? lifterDir : 0.0;
+    // If you press liftDown or liftUp at the same time, or neither at the same
+    // time, set lifting diretion to 0.
+
+    // final double liftingDirection = liftDown ? -1 : 1;
+    Boolean isLifterMoving = liftDown || liftUp;
+    _liftmotor.set(ControlMode.PercentOutput, isLifterMoving ? 0.4 * liftingDirection : 0);
 
     // For gathering
     // Read current from powerboard for shooter
@@ -305,8 +316,7 @@ public class Robot extends TimedRobot {
 
     collectorOn(collectorButton, collectorDirection < 0.0);
 
-    //If bottoom is false, then 0, if true, -1
-   
+    // If bottoom is false, then 0, if true, -1
 
     Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
     if (isShooting && !wasShooting) {
@@ -320,8 +330,7 @@ public class Robot extends TimedRobot {
 
     _magMotor1.set(feedShooter || bottom_mag_co ? 1 * directionMultiplier : 0);
     _magMotor2.set(feedShooter || topMag_co ? -1 * directionMultiplier : 0);
-   
-   
+
     if (_joystick1.getRawButton(5)) {
       _colorWheelTalon.set(ControlMode.PercentOutput, 1);
     }
@@ -587,9 +596,9 @@ public class Robot extends TimedRobot {
   // Encoder Math
   // 42 Ticks Per Rev.
 
-public void startShooterTimer() {
-  shooterTimer.reset();
-  shooterTimer.start();
-}
+  public void startShooterTimer() {
+    shooterTimer.reset();
+    shooterTimer.start();
+  }
 
 }
