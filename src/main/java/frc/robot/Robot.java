@@ -46,6 +46,10 @@ public class Robot extends TimedRobot {
 
   Joystick _joystickco = new Joystick(1);
 
+  Timer shooterTimer = new Timer();
+  Boolean wasShooting = false;
+
+
   // Joystick Buttons -
 
   CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
@@ -302,14 +306,22 @@ public class Robot extends TimedRobot {
     collectorOn(collectorButton, collectorDirection < 0.0);
 
     //If bottoom is false, then 0, if true, -1
-    _magMotor1.set(bottom_mag_co ? 1 * directionMultiplier : 0);
-    _magMotor2.set(topMag_co ? -1 * directionMultiplier : 0);
+   
 
     Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
+    if (isShooting && !wasShooting) {
+      startShooterTimer();
+    }
+    wasShooting = isShooting;
+    Boolean feedShooter = isShooting && shooterTimer.hasElapsed(0.5);
     final double shootPower = directionMultiplier * -0.9;
     _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
     _shooterMotorRight.set(isShooting ? shootPower : 0.0);
 
+    _magMotor1.set(feedShooter || bottom_mag_co ? 1 * directionMultiplier : 0);
+    _magMotor2.set(feedShooter || topMag_co ? -1 * directionMultiplier : 0);
+   
+   
     if (_joystick1.getRawButton(5)) {
       _colorWheelTalon.set(ControlMode.PercentOutput, 1);
     }
@@ -574,4 +586,10 @@ public class Robot extends TimedRobot {
 
   // Encoder Math
   // 42 Ticks Per Rev.
+
+public void startShooterTimer() {
+  shooterTimer.reset();
+  shooterTimer.start();
+}
+
 }
