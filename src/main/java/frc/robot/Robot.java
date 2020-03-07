@@ -309,8 +309,8 @@ public class Robot extends TimedRobot {
     _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
     _shooterMotorRight.set(isShooting ? shootPower : 0.0);
 
-    _magMotor1.set((feedShooter || bottom_mag_co || collectorButton) ? 1 * directionMultiplier : 0);
-    _magMotor2.set(feedShooter || topMag_co ? -1 * directionMultiplier : 0);
+    _magMotor1.set((feedShooter || bottom_mag_co ) ? 1 * directionMultiplier : 0);
+    _magMotor2.set(feedShooter || topMag_co || collectorButton ? -1 * directionMultiplier : 0);
 
     if (_joystick1.getRawButton(5)) {
       _colorWheelTalon.set(ControlMode.PercentOutput, 1);
