@@ -254,7 +254,7 @@ public class Robot extends TimedRobot {
     }
 
     double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
-    double rotate2 = _joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0);
+    double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
 
     // SmartDashboard.putNumber("Left Drive", drive_left);
 
