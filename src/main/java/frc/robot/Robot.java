@@ -309,11 +309,11 @@ public class Robot extends TimedRobot {
       if (bottom_mag_co) {
 
         _magMotor1.set(1);
-       
+
       }
 
       if (topMag_co) {
-        
+
         _magMotor2.set(-1);
 
       }
@@ -345,45 +345,40 @@ public class Robot extends TimedRobot {
         collectorOn(true, true);
 
       }
-     
+
       if (bottom_mag_co) {
         _magMotor1.set(-1);
-        
-      }
-      else {
+
+      } else {
         _magMotor1.set(0);
 
       }
 
       if (topMag_co) {
-    _magMotor2.set(1);
+        _magMotor2.set(1);
+      } else {
+        _magMotor2.set(1);
       }
-        else 
-        {     
-           _magMotor2.set(1);
-}
       if (maindriver_trigger && mainDriver_thumbButton) {
         _shooterMotorLeft.set(-90);
         _shooterMotorRight.set(90);
       }
 
-     
-    }// Color Wheel
-      if (_joystick1.getRawButton(5)) {
-        _colorWheelTalon.set(ControlMode.PercentOutput, 1);
-      }
-
-      else if (_joystick1.getRawButton(3)) {
-        _colorWheelTalon.set(ControlMode.PercentOutput, -1);
-      }
-
-      else {
-
-        _colorWheelTalon.set(ControlMode.PercentOutput, 0);
-
-      }
+    } // Color Wheel
+    if (_joystick1.getRawButton(5)) {
+      _colorWheelTalon.set(ControlMode.PercentOutput, 1);
     }
-  
+
+    else if (_joystick1.getRawButton(3)) {
+      _colorWheelTalon.set(ControlMode.PercentOutput, -1);
+    }
+
+    else {
+
+      _colorWheelTalon.set(ControlMode.PercentOutput, 0);
+
+    }
+  }
 
   public void Update_Limelight_Tracking() {
     // These numbers must be tuned for your Robot! Be careful!
@@ -595,7 +590,6 @@ public class Robot extends TimedRobot {
     _shooterMotorLeft.set(Power_Positive);
     _shooterMotorRight.set(-Power_Positive);
   }
-
 
   public void collectorOn(boolean Active, boolean Direction) {
     // false is normal, true is reversed.
