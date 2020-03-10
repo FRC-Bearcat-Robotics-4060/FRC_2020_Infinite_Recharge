@@ -113,12 +113,12 @@ public class Robot extends TimedRobot {
     CameraServer.getInstance().startAutomaticCapture();
 
     final double rampSeconds = 0.15;
-    _leftBackCanSparkMax.setClosedLoopRampRate(rampSeconds);
-    _leftFrontCanSparkMax.setClosedLoopRampRate(rampSeconds);
-    _rightBackCanSparkMax.setClosedLoopRampRate(rampSeconds);
-    _rightFrontCanSparkMax.setClosedLoopRampRate(rampSeconds);
-    _shooterMotorLeft.setClosedLoopRampRate(rampSeconds);
-    _shooterMotorRight.setClosedLoopRampRate(rampSeconds);
+    _leftBackCanSparkMax.setOpenLoopRampRate(rampSeconds);
+    _leftFrontCanSparkMax.setOpenLoopRampRate(rampSeconds);
+    _rightBackCanSparkMax.setOpenLoopRampRate(rampSeconds);
+    _rightFrontCanSparkMax.setOpenLoopRampRate(rampSeconds);
+    _shooterMotorLeft.setOpenLoopRampRate(rampSeconds);
+    _shooterMotorRight.setOpenLoopRampRate(rampSeconds);
 
     _leftBackCanSparkMax.setIdleMode(IdleMode.kCoast);
     _leftFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
