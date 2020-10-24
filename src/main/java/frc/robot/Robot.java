@@ -43,7 +43,6 @@ public class Robot extends TimedRobot {
   AHRS navx;
 
   Joystick _joystick1 = new Joystick(0);
-
   Joystick _joystickco = new Joystick(1);
 
   Timer shooterTimer = new Timer();
@@ -52,25 +51,20 @@ public class Robot extends TimedRobot {
   // Joystick Buttons -
 
   CANSparkMax _leftBackCanSparkMax = new CANSparkMax((1), MotorType.kBrushless);
-
   CANSparkMax _leftFrontCanSparkMax = new CANSparkMax((4), MotorType.kBrushless);
-
   CANSparkMax _rightBackCanSparkMax = new CANSparkMax((2), MotorType.kBrushless);
-
   CANSparkMax _rightFrontCanSparkMax = new CANSparkMax((3), MotorType.kBrushless);
+  private SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(_leftBackCanSparkMax, _leftFrontCanSparkMax);
+  private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
+  private DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
+
 
   CANSparkMax _collectVert = new CANSparkMax((13), MotorType.kBrushless);
 
   CANSparkMax _shooterMotorLeft = new CANSparkMax((14), MotorType.kBrushless);
-
   CANSparkMax _shooterMotorRight = new CANSparkMax((15), MotorType.kBrushless);
 
   // CANSparkMax _miscSpark = new CANSparkMax((null), MotorType.kBrushless);
-
-  private SpeedControllerGroup m_LeftMotors = new SpeedControllerGroup(_leftBackCanSparkMax, _leftFrontCanSparkMax);
-  private SpeedControllerGroup m_RightMotors = new SpeedControllerGroup(_rightBackCanSparkMax, _rightFrontCanSparkMax);
-
-  private DifferentialDrive m_Drive = new DifferentialDrive(m_LeftMotors, m_RightMotors);
 
   TalonSRX _colorWheelTalon = new TalonSRX(10);
 
@@ -79,7 +73,6 @@ public class Robot extends TimedRobot {
   TalonSRX _liftmotor = new TalonSRX(12);
 
   Spark _magMotor1 = new Spark(0);
-
   Spark _magMotor2 = new Spark(1);
 
   Boolean button12Toggle = false;
@@ -90,9 +83,7 @@ public class Robot extends TimedRobot {
   Boolean lightspeed = false;
 
   private final I2C.Port i2cPort = I2C.Port.kOnboard;
-
   private final ColorSensorV3 m_colorSensor = new ColorSensorV3(i2cPort);
-
   private final ColorMatch m_colorMatcher = new ColorMatch();
 
   private final Color kBlueTarget = ColorMatch.makeColor(0.143, 0.427, 0.429);
@@ -227,12 +218,9 @@ public class Robot extends TimedRobot {
 
   @Override
   public void teleopInit() {
-
     speedToggle = false;
     Update_Limelight_Tracking();
-
     limelightTracking(false);
-
   }
 
   @Override
@@ -240,14 +228,10 @@ public class Robot extends TimedRobot {
     buttonToggles();
 
     double collectorDirection = -_joystick1.getRawAxis(3);
-
     double deadzone = 0.3;
-
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-
     double _joyforwardRaw = -_joystick1.getY();
     double _joyrotateRaw = _joystick1.getZ();
-
     double _joyforward;
     double _joyrotate;
 
@@ -263,7 +247,6 @@ public class Robot extends TimedRobot {
     double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
 
     // SmartDashboard.putNumber("Left Drive", drive_left);
-
     // SmartDashboard.putNumber("Right Drive", drive_right);
 
     if (_joystick1.getRawButton(3)) {
@@ -312,7 +295,7 @@ public class Robot extends TimedRobot {
     _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
     _shooterMotorRight.set(isShooting ? shootPower : 0.0);
 
-    _magMotor1.set((feedShooter || bottom_mag_co ) ? 1 * directionMultiplier : 0);
+    _magMotor1.set((feedShooter || bottom_mag_co) ? 1 * directionMultiplier : 0);
     _magMotor2.set(feedShooter || topMag_co || collectorButton ? -1 * directionMultiplier : 0);
 
     if (_joystick1.getRawButton(5)) {
@@ -324,9 +307,7 @@ public class Robot extends TimedRobot {
     }
 
     else {
-
       _colorWheelTalon.set(ControlMode.PercentOutput, 0);
-
     }
   }
 
@@ -353,9 +334,7 @@ public class Robot extends TimedRobot {
       m_LimelightSteerCommand = 0.0;
       return;
     } else if (tv == 1.0) {
-
       m_LimelightHasValidTarget = true;
-
     }
 
     // Start with proportional steering
@@ -396,22 +375,16 @@ public class Robot extends TimedRobot {
       if (m_LimelightHasValidTarget) {
         m_Drive.arcadeDrive(-m_LimelightDriveCommand, m_LimelightSteerCommand);
         System.out.println("Drive" + -m_LimelightDriveCommand);
-
         System.out.println("Steer" + -m_LimelightSteerCommand);
       }
-
       else if (_tavar > 3.0) {
-
         m_Drive.arcadeDrive(-0.3, 0);
-
       } else {
         m_Drive.arcadeDrive(0.0, 0.0);
       }
-
     } else {
       m_Drive.arcadeDrive(drive / 2, steer / 2);
     }
-
   }
 
   public void limelightShooter() {
@@ -428,31 +401,19 @@ public class Robot extends TimedRobot {
 
         System.out.println("Steer" + -m_LimelightSteerCommand);
       }
-
-      else if (_tavar > 3.0) {
-
-      } else {
-
-      }
-
-    } else {
-
     }
-
   }
 
   public void buttonToggles() {
     int speedbutton = 11;
 
     if (_joystick1.getRawButtonPressed(speedbutton)) {
-
       if (!speedToggle) {
         speedToggle = true;
       } else if (speedToggle) {
         speedToggle = false;
       }
     }
-
   }
 
   public void navxReadout() {
@@ -547,7 +508,6 @@ public class Robot extends TimedRobot {
       if (!Direction) {
         _ColectorMotor.set(ControlMode.PercentOutput, -0.75);
         _collectVert.set(-0.95);
-
       } else if (Direction) {
         _ColectorMotor.set(ControlMode.PercentOutput, 0.75);
         _collectVert.set(0.95);
@@ -567,7 +527,6 @@ public class Robot extends TimedRobot {
       camMode.setDouble(1);
     } else {
       ledEntry.setDouble(3);
-
       camMode.setDouble(0);
     }
   }
