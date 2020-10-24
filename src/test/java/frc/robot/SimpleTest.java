@@ -29,7 +29,7 @@ public class SimpleTest {
     @Test
     public void shouldBeOkToAlterTestData() {
         list.remove(0); // Remove first element of list.
-        assertEquals(4, list.size()); // Size is down to five
+        assertEquals(5, list.size()); // Size is down to five
     }
 
     @Test
