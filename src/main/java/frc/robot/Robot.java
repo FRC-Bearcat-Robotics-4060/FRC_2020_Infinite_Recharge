@@ -254,9 +254,7 @@ public class Robot extends TimedRobot {
     // double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
     // double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
 
-   // SmartDashboard.putNumber("Left Drive", drive_left);
-    //SmartDashboard.putNumber("Right Drive", drive_right);
-
+   
     if (_joystick1.getRawButton(5)) {
       limelightAutonomous();
     }
@@ -266,59 +264,49 @@ public class Robot extends TimedRobot {
     // Lifting
     //Set Buttons
 
-    Boolean liftUp = _joystick1.getRawButton() //ADD DPAD UP
-    Boolean liftDown = _joystick1.getRawButton() //ADD DPAD DOWN
+    Boolean liftUp = _joystick1.getRawButton(); //ADD DPAD UP
+    Boolean liftDown = _joystick1.getRawButton(); //ADD DPAD DOWN
     
   //Tell motor what to do
 
     _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4) : 0.0);
 
-    // For gathering
-    // Read current from powerboard for shooter
-    // Trigger + Thumb = Shooting
-    // Thumb = Magazine loading
-    // Trigger = Collector
-    // Direction
-    // Down
-    // boolean collectorButton = _joystick1.getRawButton(1);
-    // boolean magazineAll_co = _joystick1.getRawButton(3);
-    // boolean bottom_mag_co = _joystick1.getRawButton(5);
-    // boolean topMag_co = _joystick1.getRawButton(6);
-    // boolean maindriver_trigger = _joystick1.getRawButton(1);
-    // boolean mainDriver_thumbButton = _joystick1.getRawButton(2);
+      // For gathering
+      // Read current from powerboard for shooter
+      // Right Trigger Shooting
+      // Collector Left Shoulder
 
-    // -1 == Reverse direction of collector
-    //double directionMultiplier = collectorDirection > 0.0 ? 1.0 : -1.0;
-
-    //collectorOn(collectorButton, collectorDirection < 0.0);
-
-    // If bottoom is false, then 0, if true, -1
-
-   // Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
-    //if (isShooting && !wasShooting) {
-     // startShooterTimer();
-   // }
-    //wasShooting = isShooting;
-    // Boolean feedShooter = isShooting && shooterTimer.hasElapsed(0.5);
-    // final double shootPower = directionMultiplier * -0.9;
-   // _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
-    //_shooterMotorRight.set(isShooting ? shootPower : 0.0);
-
-    // _magMotor1.set((feedShooter || bottom_mag_co) ? 1 * directionMultiplier : 0);
-    // _magMotor2.set(feedShooter || topMag_co || collectorButton ? -1 * directionMultiplier : 0);
-
-    if (_joystick1.getRawButton(5)) {
-      _colorWheelTalon.set(ControlMode.PercentOutput, 1);
+        //Top and bottom parts of collector, plus if balls should be collected 
+        //WILL be handled by retroreflective sensors! 
+      
+    
+    boolean collectorButton = _joystick1.getRawButton(); //Left Shoulder
+      boolean shooterButton = _joystick1.getRawButton(); //Right Trigger (Is float, not bool)
+        
+    if (shooterButton) {
+      startShooterTimer(); //<---- Investigate WHAT IS ShooterTimer?
     }
+    
+    // Boolean feedShooter WILL be determined by digital readouts (BOOL) from sensors.
 
-    else if (_joystick1.getRawButton(3)) {
-      _colorWheelTalon.set(ControlMode.PercentOutput, -1);
-    }
+    
+      _shooterMotorLeft.set(shooterButton ? -0.9 : 0.0);
+      _shooterMotorRight.set(shooterButton ? 0.9 : 0.0);
 
-    else {
-      _colorWheelTalon.set(ControlMode.PercentOutput, 0);
-    }
-  }
+   
+
+  //   if (_joystick1.getRawButton(5)) {
+  //     _colorWheelTalon.set(ControlMode.PercentOutput, 1);
+  //   }
+
+  //   else if (_joystick1.getRawButton(3)) {
+  //     _colorWheelTalon.set(ControlMode.PercentOutput, -1);     <--- No Clue What ANY of this did.
+  //   }
+
+  //   else {
+  //     _colorWheelTalon.set(ControlMode.PercentOutput, 0);
+  //   }
+  // }
 
   public void Update_Limelight_Tracking() {
     // These numbers must be tuned for your Robot! Be careful!
