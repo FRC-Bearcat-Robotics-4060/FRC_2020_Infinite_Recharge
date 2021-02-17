@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
   AHRS navx;
 
   Joystick _joystick1 = new Joystick(0);
-  Joystick _joystickco = new Joystick(1);
+  //Change to DPad like control schemea
 
   Timer shooterTimer = new Timer();
   Boolean wasShooting = false;
@@ -101,9 +101,16 @@ public class Robot extends TimedRobot {
   @Override
   public void robotInit() {
 
+
+//Init USB Camera Server For Streaming
     CameraServer.getInstance().startAutomaticCapture();
 
+
+
+//Set amount of time allowed for RAMP
     final double rampSeconds = 0.15;
+
+    //Set The Max Time allowed for mode OpenLoopRampRate
     _leftBackCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _leftFrontCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _rightBackCanSparkMax.setOpenLoopRampRate(rampSeconds);
@@ -111,11 +118,15 @@ public class Robot extends TimedRobot {
     _shooterMotorLeft.setOpenLoopRampRate(rampSeconds);
     _shooterMotorRight.setOpenLoopRampRate(rampSeconds);
 
+
+//Set IDLE Modes for SparkMax's
     _leftBackCanSparkMax.setIdleMode(IdleMode.kCoast);
     _leftFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
     _rightBackCanSparkMax.setIdleMode(IdleMode.kCoast);
     _rightFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
 
+
+//Add Colors For Color Matcher to Find
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
@@ -227,42 +238,39 @@ public class Robot extends TimedRobot {
   public void teleopPeriodic() {
     buttonToggles();
 
-    double collectorDirection = -_joystick1.getRawAxis(3);
+    
     double deadzone = 0.3;
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-    double _joyforwardRaw = -_joystick1.getY();
-    double _joyrotateRaw = _joystick1.getZ();
-    double _joyforward;
-    double _joyrotate;
+  
 
-    if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
-      _joyforward = _joyforwardRaw;
-    }
+    // if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
+    //   _joyforward = _joyforwardRaw;
+    // }
 
-    if (_joyrotateRaw > deadzone || _joyrotateRaw < -deadzone) {
-      _joyrotate = _joyrotateRaw;
-    }
+    // if (_joyrotateRaw > deadzone || _joyrotateRaw < -deadzone) {
+    //   _joyrotate = _joyrotateRaw;
+    // }
 
-    double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
-    double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
+    // double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
+    // double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
 
-    // SmartDashboard.putNumber("Left Drive", drive_left);
-    // SmartDashboard.putNumber("Right Drive", drive_right);
+   // SmartDashboard.putNumber("Left Drive", drive_left);
+    //SmartDashboard.putNumber("Right Drive", drive_right);
 
-    if (_joystick1.getRawButton(3)) {
+    if (_joystick1.getRawButton(5)) {
       limelightAutonomous();
     }
 
-    m_Drive.arcadeDrive(forward2, rotate2, false);
+    //m_Drive.arcadeDrive(forward2, rotate2, false);
 
     // Lifting
-    Boolean liftUp = _joystick1.getRawButton(4);
-    Boolean liftDown = _joystick1.getRawButton(6);
-    double lifterDir = liftDown ? 1 : -1;
+   // Boolean liftUp = _joystick1.getRawButton(4);
+    //Boolean liftDown = _joystick1.getRawButton(6);
+    //double lifterDir = liftDown ? 1 : -1;
     // If you press liftDown or liftUp at the same time, or neither at the same
     // time, set lifting diretion to 0.
 
-    _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4 * lifterDir) : 0.0);
+    //_liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4 * lifterDir) : 0.0);
 
     // For gathering
     // Read current from powerboard for shooter
@@ -271,32 +279,32 @@ public class Robot extends TimedRobot {
     // Trigger = Collector
     // Direction
     // Down
-    boolean collectorButton = _joystickco.getRawButton(1);
-    boolean magazineAll_co = _joystickco.getRawButton(3);
-    boolean bottom_mag_co = _joystickco.getRawButton(5);
-    boolean topMag_co = _joystickco.getRawButton(6);
-    boolean maindriver_trigger = _joystick1.getRawButton(1);
-    boolean mainDriver_thumbButton = _joystick1.getRawButton(2);
+    // boolean collectorButton = _joystick1.getRawButton(1);
+    // boolean magazineAll_co = _joystick1.getRawButton(3);
+    // boolean bottom_mag_co = _joystick1.getRawButton(5);
+    // boolean topMag_co = _joystick1.getRawButton(6);
+    // boolean maindriver_trigger = _joystick1.getRawButton(1);
+    // boolean mainDriver_thumbButton = _joystick1.getRawButton(2);
 
     // -1 == Reverse direction of collector
-    double directionMultiplier = collectorDirection > 0.0 ? 1.0 : -1.0;
+    //double directionMultiplier = collectorDirection > 0.0 ? 1.0 : -1.0;
 
-    collectorOn(collectorButton, collectorDirection < 0.0);
+    //collectorOn(collectorButton, collectorDirection < 0.0);
 
     // If bottoom is false, then 0, if true, -1
 
-    Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
-    if (isShooting && !wasShooting) {
-      startShooterTimer();
-    }
-    wasShooting = isShooting;
-    Boolean feedShooter = isShooting && shooterTimer.hasElapsed(0.5);
-    final double shootPower = directionMultiplier * -0.9;
-    _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
-    _shooterMotorRight.set(isShooting ? shootPower : 0.0);
+   // Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
+    //if (isShooting && !wasShooting) {
+     // startShooterTimer();
+   // }
+    //wasShooting = isShooting;
+    // Boolean feedShooter = isShooting && shooterTimer.hasElapsed(0.5);
+    // final double shootPower = directionMultiplier * -0.9;
+   // _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
+    //_shooterMotorRight.set(isShooting ? shootPower : 0.0);
 
-    _magMotor1.set((feedShooter || bottom_mag_co) ? 1 * directionMultiplier : 0);
-    _magMotor2.set(feedShooter || topMag_co || collectorButton ? -1 * directionMultiplier : 0);
+    // _magMotor1.set((feedShooter || bottom_mag_co) ? 1 * directionMultiplier : 0);
+    // _magMotor2.set(feedShooter || topMag_co || collectorButton ? -1 * directionMultiplier : 0);
 
     if (_joystick1.getRawButton(5)) {
       _colorWheelTalon.set(ControlMode.PercentOutput, 1);
