@@ -264,8 +264,10 @@ public class Robot extends TimedRobot {
     // Lifting
     //Set Buttons
 
-    Boolean liftUp = _joystick1.getRawButton(); //ADD DPAD UP
-    Boolean liftDown = _joystick1.getRawButton(); //ADD DPAD DOWN
+  int dpadDir = _joystick1.getPOV(0);
+
+    Boolean liftUp = (dpadDir == 0) ? true : false; //ADD DPAD UP
+    Boolean liftDown = (dpadDir == 180) ? true : false; //ADD DPAD DOWN
     
   //Tell motor what to do
 
@@ -280,8 +282,8 @@ public class Robot extends TimedRobot {
         //WILL be handled by retroreflective sensors! 
       
     
-    boolean collectorButton = _joystick1.getRawButton(); //Left Shoulder
-      boolean shooterButton = _joystick1.getRawButton(); //Right Trigger (Is float, not bool)
+    boolean collectorButton = _joystick1.getRawButton(0); //Left Shoulder
+      boolean shooterButton = _joystick1.getRawButton(0); //Right Trigger (Is float, not bool)
         
     if (shooterButton) {
       startShooterTimer(); //<---- Investigate WHAT IS ShooterTimer?
@@ -293,7 +295,7 @@ public class Robot extends TimedRobot {
       _shooterMotorLeft.set(shooterButton ? -0.9 : 0.0);
       _shooterMotorRight.set(shooterButton ? 0.9 : 0.0);
 
-   
+  } 
 
   //   if (_joystick1.getRawButton(5)) {
   //     _colorWheelTalon.set(ControlMode.PercentOutput, 1);
@@ -542,3 +544,4 @@ public class Robot extends TimedRobot {
   }
 
 }
+
