@@ -268,10 +268,21 @@ public class Robot extends TimedRobot {
 
     Boolean liftUp = (dpadDir == 0) ? true : false; //ADD DPAD UP
     Boolean liftDown = (dpadDir == 180) ? true : false; //ADD DPAD DOWN
-    
+    SmartDashboard.putNumber("DPadDir", dpadDir);    
   //Tell motor what to do
 
-    _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4) : 0.0);
+    // _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4) : 0.0);
+  if (liftUp) {
+    _liftmotor.set(ControlMode.PercentOutput, 0.4);
+  }
+  else if (liftDown) {
+   _liftmotor.set(ControlMode.PercentOutput, -0.4);
+   } 
+   else {
+     _liftmotor.set(ControlMode.PercentOutput, 0.0);
+  }
+  
+
 
       // For gathering
       // Read current from powerboard for shooter
@@ -282,7 +293,7 @@ public class Robot extends TimedRobot {
         //WILL be handled by retroreflective sensors! 
       
     
-    boolean collectorButton = _joystick1.getRawButton(0); //Left Shoulder
+    boolean collectorButton = _joystick1.getRawButton(5); //Left Shoulder
       boolean shooterButton = _joystick1.getRawButton(0); //Right Trigger (Is float, not bool)
         
     if (shooterButton) {
