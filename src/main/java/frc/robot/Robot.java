@@ -117,6 +117,7 @@ public class Robot extends TimedRobot {
     _rightFrontCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _shooterMotorLeft.setOpenLoopRampRate(rampSeconds);
     _shooterMotorRight.setOpenLoopRampRate(rampSeconds);
+    _collectVert.setOpenLoopRampRate(rampSeconds);
 
 
 //Set IDLE Modes for SparkMax's
@@ -242,7 +243,7 @@ public class Robot extends TimedRobot {
     double deadzone = 0.3;
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
   
-//Get left Joystick and invert it 
+//Get left and right Joysticks and invert it 
 
   double _leftjoyforwardRaw = -_joystick1.getRawAxis(1);
   double _rightsidejoysideRaw = _joystick1.getRawAxis(4);
@@ -254,8 +255,12 @@ public class Robot extends TimedRobot {
     double forward = (_leftjoyforwardRaw * 0.5);
     double rotate = (_rightsidejoysideRaw * 0.5);
 
-    if (_joystick1.getRawButton(5)) {
+    if (_joystick1.getRawButton(3)) {
       limelightAutonomous();
+    }
+    else {
+      ledEntry.setDouble(1);
+      camMode.setDouble(1);
     }
 
     m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), false);
@@ -295,6 +300,15 @@ public class Robot extends TimedRobot {
     boolean collectorButton = _joystick1.getRawButton(5); //Left Shoulder
       boolean shooterButton = _joystick1.getRawButton(0); //Right Trigger (Is float, not bool)
         
+      if (collectorButton) {
+        _ColectorMotor.set(ControlMode.PercentOutput, -0.5);
+        _collectVert.set(-0.5);
+      }
+      else {
+        _ColectorMotor.set(ControlMode.PercentOutput, 0.0);
+       _collectVert.set(0.0);
+      }
+
     if (shooterButton) {
       startShooterTimer(); //<---- Investigate WHAT IS ShooterTimer?
     }
