@@ -242,27 +242,22 @@ public class Robot extends TimedRobot {
     double deadzone = 0.3;
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
   
-  double _joyforwardRaw = _joystick1.getY;
-      SmartDashboard.putNumber("RawY", _joyforwardRaw);    
+//Get left Joystick and invert it 
 
+  double _leftjoyforwardRaw = -_joystick1.getRawAxis(1);
+  double _rightsidejoysideRaw = _joystick1.getRawAxis(4);
+      SmartDashboard.putNumber("Raw1", _leftjoyforwardRaw);    
+   SmartDashboard.putNumber("Raw4", _rightsidejoysideRaw);    
 
-    // if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
-    //   _joyforward = _joyforwardRaw;
-    // }
-
-    // if (_joyrotateRaw > deadzone || _joyrotateRaw < -deadzone) {
-    //   _joyrotate = _joyrotateRaw;
-    // }
-
-    // double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
-    // double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
+    double forward = _leftjoyforwardRaw * (_leftjoyforwardRaw < 0 ? -1.0 : 1.0);
+    double rotate = 0.5 * (_rightsidejoysideRaw * (_rightsidejoysideRaw < 0 ? -1.0 : 1.0));
 
    
     if (_joystick1.getRawButton(5)) {
       limelightAutonomous();
     }
 
-    m_Drive.arcadeDrive(forward2, rotate2, false);
+    m_Drive.arcadeDrive(forward, rotate, false);
 
     // Lifting
     //Set Buttons
