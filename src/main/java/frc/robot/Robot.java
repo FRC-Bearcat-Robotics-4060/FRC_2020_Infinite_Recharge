@@ -249,15 +249,16 @@ public class Robot extends TimedRobot {
       SmartDashboard.putNumber("Raw1", _leftjoyforwardRaw);    
    SmartDashboard.putNumber("Raw4", _rightsidejoysideRaw);    
 
-    double forward = _leftjoyforwardRaw * (_leftjoyforwardRaw < 0 ? -1.0 : 1.0);
-    double rotate = 0.5 * (_rightsidejoysideRaw * (_rightsidejoysideRaw < 0 ? -1.0 : 1.0));
+    
 
-   
+    double forward = (_leftjoyforwardRaw * 0.5);
+    double rotate = (_rightsidejoysideRaw * 0.5);
+
     if (_joystick1.getRawButton(5)) {
       limelightAutonomous();
     }
 
-    m_Drive.arcadeDrive(forward, rotate, false);
+    m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), false);
 
     // Lifting
     //Set Buttons
