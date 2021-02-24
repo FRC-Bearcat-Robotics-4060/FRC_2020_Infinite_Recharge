@@ -242,6 +242,9 @@ public class Robot extends TimedRobot {
     double deadzone = 0.3;
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
   
+  double _joyforwardRaw = _joystick1.getY;
+      SmartDashboard.putNumber("RawY", _joyforwardRaw);    
+
 
     // if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
     //   _joyforward = _joyforwardRaw;
@@ -259,7 +262,7 @@ public class Robot extends TimedRobot {
       limelightAutonomous();
     }
 
-    //m_Drive.arcadeDrive(forward2, rotate2, false);
+    m_Drive.arcadeDrive(forward2, rotate2, false);
 
     // Lifting
     //Set Buttons
