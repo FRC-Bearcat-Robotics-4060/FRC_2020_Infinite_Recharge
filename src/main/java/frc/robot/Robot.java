@@ -72,6 +72,10 @@ public class Robot extends TimedRobot {
 
   TalonSRX _liftmotor = new TalonSRX(12);
 
+  DigitalInput bottomSensor = new DigitalInput(0);
+
+  DigitalInput topSensor = new DigitalInput(1);
+
   Spark _magMotor1 = new Spark(0);
   Spark _magMotor2 = new Spark(1);
 
@@ -97,6 +101,11 @@ public class Robot extends TimedRobot {
   private boolean m_LimelightHasValidTarget = false;
   private double m_LimelightDriveCommand = 0.0;
   private double m_LimelightSteerCommand = 0.0;
+
+  int numbOfBalls;
+
+  int bottomSensorLock;
+  int topSensorLock;
 
   @Override
   public void robotInit() {
@@ -163,6 +172,11 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Left Encoder_Graph", leftBack_encoder.getPosition());
     SmartDashboard.putNumber("Right Encoder_Graph", rightBack_encoder.getPosition());
+
+    SmartDashboard.putBoolean("BottomSensor", bottomSensor.get());
+
+    SmartDashboard.putBoolean("TopSensor", topSensor.get());
+
 
     Color detectedColor = m_colorSensor.getColor();
     String colorString;
@@ -233,6 +247,9 @@ public class Robot extends TimedRobot {
     speedToggle = false;
     Update_Limelight_Tracking();
     limelightTracking(false);
+    numbOfBalls = 0;
+    bottomSensorLock = 0;
+    topSensorLock = 0;
   }
 
   @Override
@@ -265,8 +282,11 @@ public class Robot extends TimedRobot {
 
     m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), false);
 
-    // Lifting
+    // Lifting and collecting
     //Set Buttons
+
+    boolean collectorButton = _joystick1.getRawButton(5); //Left Shoulder
+      boolean shooterButton = _joystick1.getRawButton(0); //Right Trigger (Is float, not bool)
 
   int dpadDir = _joystick1.getPOV(0);
 
@@ -296,13 +316,36 @@ public class Robot extends TimedRobot {
         //Top and bottom parts of collector, plus if balls should be collected 
         //WILL be handled by retroreflective sensors! 
       
+        //Add collector Logic
+
+      if (bottomSensorLock != 0 && !bottomSensor.get() && collectorButton) {
+        numbOfBalls ++;
+        bottomSensorLock = 1;
+      }
+      else if (bottomSensorLock == 1 && bottomSensor.get() && !collectorButton) {
+        bottomSensorLock = 0;
+      }
     
-    boolean collectorButton = _joystick1.getRawButton(5); //Left Shoulder
-      boolean shooterButton = _joystick1.getRawButton(0); //Right Trigger (Is float, not bool)
+
+      if (topSensorLock != 0 && !topSensor.get() && collectorButton) {
+        numbOfBalls ++;
+        topSensorLock = 1;
+      }
+      else if (topSensorLock == 1 && topSensor.get() && !collectorButton) {
+        topSensorLock = 0;
+      }
+
+        SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
+
+
+    
         
       if (collectorButton) {
         _ColectorMotor.set(ControlMode.PercentOutput, -0.5);
         _collectVert.set(-0.5);
+
+      
+
       }
       else {
         _ColectorMotor.set(ControlMode.PercentOutput, 0.0);
