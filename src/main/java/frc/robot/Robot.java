@@ -101,6 +101,7 @@ public class Robot extends TimedRobot {
   private boolean m_LimelightHasValidTarget = false;
   private double m_LimelightDriveCommand = 0.0;
   private double m_LimelightSteerCommand = 0.0;
+  private boolean isGettingBall = false;
 
   int numbOfBalls;
 
@@ -248,8 +249,8 @@ public class Robot extends TimedRobot {
     Update_Limelight_Tracking();
     limelightTracking(false);
     numbOfBalls = 0;
-    bottomSensorLock = 0;
-    topSensorLock = 0;
+    bottomSensorLock = 1;
+    topSensorLock = 1;
   }
 
   @Override
@@ -321,9 +322,11 @@ public class Robot extends TimedRobot {
       if (bottomSensorLock != 0 && !bottomSensor.get() && collectorButton) {
         numbOfBalls ++;
         bottomSensorLock = 1;
+        isGettingBall = true;
       }
       else if (bottomSensorLock == 1 && bottomSensor.get() && !collectorButton) {
         bottomSensorLock = 0;
+        isGettingBall = false;
       }
     
 
@@ -336,7 +339,8 @@ public class Robot extends TimedRobot {
       }
 
         SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
-
+        SmartDashboard.putNumber("bottomSensorLock", bottomSensorLock);        
+        SmartDashboard.putBoolean("isGettingBall", isGettingBall);
 
     
         
