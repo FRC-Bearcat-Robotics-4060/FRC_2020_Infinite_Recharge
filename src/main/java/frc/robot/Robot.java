@@ -340,6 +340,37 @@ public class Robot extends TimedRobot {
         topSensorLock = 0;
       }
 
+  //Now do the ball collecting logic for running through the uh... 'sack'
+
+        if (numbOfBalls < 0) {
+                  System.out.println("Collector Has Negative Balls");
+        }
+        else if (numbOfBalls > 5) {
+                  System.out.println("More Then five Balls");
+        }
+
+        //When collecting and balls are zero, run bottom collector only, if one then run both.
+
+      if (numbOfBalls == 0) {
+        _magMotor1.set(-0.4);
+      }
+      else if (numbOfBalls >= 1) {
+        _magMotor1.set(-0.4);
+        _magMotor2.set(0.4);
+      }
+
+      if (!topSensor.get()) {
+        _shooterMotorLeft.set(-0.8);
+        _shooterMotorRight.set(0.8);
+      }
+
+        }
+
+        else {
+        _magMotor1.set(0);
+        _magMotor2.set(0);
+       _shooterMotorLeft.set(0);
+        _shooterMotorRight.set(0);
         }
 
         SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
@@ -364,11 +395,9 @@ public class Robot extends TimedRobot {
       startShooterTimer(); //<---- Investigate WHAT IS ShooterTimer?
     }
     
-    // Boolean feedShooter WILL be determined by digital readouts (BOOL) from sensors.
-
     
-      _shooterMotorLeft.set(shooterButton ? -0.9 : 0.0);
-      _shooterMotorRight.set(shooterButton ? 0.9 : 0.0);
+    
+    
 
   } 
 
