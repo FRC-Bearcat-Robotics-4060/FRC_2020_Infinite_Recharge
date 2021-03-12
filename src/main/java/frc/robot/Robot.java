@@ -287,7 +287,7 @@ public class Robot extends TimedRobot {
     //Set Buttons
 
     boolean collectorButton = _joystick1.getRawButton(5); //Left Shoulder
-      boolean shooterButton = _joystick1.getRawButton(0); //Right Trigger (Is float, not bool)
+      boolean shooterButton = _joystick1.getRawButton(6); //Right Trigger (Is float, not bool)
 
   int dpadDir = _joystick1.getPOV(0);
 
@@ -332,15 +332,15 @@ public class Robot extends TimedRobot {
       }
     
 
-      if (topSensorLock == 0 && !topSensor.get()) {
+      if (topSensorLock == 0 && topSensor.get()) {
         numbOfBalls --;
         topSensorLock = 1;
       }
-      else if (topSensorLock == 1 && topSensor.get()) {
+      else if (topSensorLock == 1 && !topSensor.get()) {
         topSensorLock = 0;
       }
 
-  //Now do the ball collecting logic for running through the uh... 'sack'
+  //Now do the ball collecting logic for running through the carage feed
 
         if (numbOfBalls < 0) {
                   System.out.println("Collector Has Negative Balls");
@@ -354,24 +354,38 @@ public class Robot extends TimedRobot {
       if (numbOfBalls == 0) {
         _magMotor1.set(-0.4);
       }
-      else if (numbOfBalls >= 1) {
+      else if (numbOfBalls >= 1 && topSensor.get()) {
         _magMotor1.set(-0.4);
         _magMotor2.set(0.4);
       }
-
-      if (!topSensor.get()) {
-        _shooterMotorLeft.set(-0.8);
-        _shooterMotorRight.set(0.8);
+      else if (numbOfBalls >= 1 && !topSensor.get()){
+                _magMotor1.set(-0.4);
+                _magMotor2.set(0);
       }
-
-        }
-
         else {
         _magMotor1.set(0);
         _magMotor2.set(0);
-       _shooterMotorLeft.set(0);
-        _shooterMotorRight.set(0);
         }
+  }
+
+else {
+        _magMotor1.set(0);
+        _magMotor2.set(0);
+        }
+
+        if (shooterButton && !collectorButton) {
+        _shooterMotorLeft.set(-0.8);
+        _shooterMotorRight.set(0.8);
+                _magMotor2.set(0.4);
+        }
+      else if (!shooterButton && !collectorButton) {
+        _shooterMotorLeft.set(0);
+        _shooterMotorRight.set(0);
+        _magMotor2.set(0);
+      }
+
+
+        
 
         SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
         SmartDashboard.putNumber("bottomSensorLock", bottomSensorLock);        
