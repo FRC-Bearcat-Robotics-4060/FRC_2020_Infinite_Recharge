@@ -319,24 +319,28 @@ public class Robot extends TimedRobot {
       
         //Add collector Logic
 
-      if (bottomSensorLock != 0 && !bottomSensor.get() && collectorButton) {
+        if (collectorButton) {
+
+      if (bottomSensorLock == 0 && !bottomSensor.get()) {
         numbOfBalls ++;
         bottomSensorLock = 1;
         isGettingBall = true;
       }
-      else if (bottomSensorLock == 1 && bottomSensor.get() && !collectorButton) {
+      else if (bottomSensorLock == 1 && bottomSensor.get()) {
         bottomSensorLock = 0;
         isGettingBall = false;
       }
     
 
-      if (topSensorLock != 0 && !topSensor.get() && collectorButton) {
-        numbOfBalls ++;
+      if (topSensorLock == 0 && !topSensor.get()) {
+        numbOfBalls --;
         topSensorLock = 1;
       }
-      else if (topSensorLock == 1 && topSensor.get() && !collectorButton) {
+      else if (topSensorLock == 1 && topSensor.get()) {
         topSensorLock = 0;
       }
+
+        }
 
         SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
         SmartDashboard.putNumber("bottomSensorLock", bottomSensorLock);        
