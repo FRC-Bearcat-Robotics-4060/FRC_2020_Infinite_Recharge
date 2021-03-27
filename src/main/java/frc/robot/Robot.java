@@ -43,7 +43,7 @@ public class Robot extends TimedRobot {
   AHRS navx;
 
   Joystick _joystick1 = new Joystick(0);
-  Joystick _joystickco = new Joystick(1);
+  //Change to DPad like control schemea
 
   Timer shooterTimer = new Timer();
   Boolean wasShooting = false;
@@ -72,6 +72,10 @@ public class Robot extends TimedRobot {
 
   TalonSRX _liftmotor = new TalonSRX(12);
 
+  DigitalInput bottomSensor = new DigitalInput(0);
+
+  DigitalInput topSensor = new DigitalInput(1);
+
   Spark _magMotor1 = new Spark(0);
   Spark _magMotor2 = new Spark(1);
 
@@ -97,25 +101,43 @@ public class Robot extends TimedRobot {
   private boolean m_LimelightHasValidTarget = false;
   private double m_LimelightDriveCommand = 0.0;
   private double m_LimelightSteerCommand = 0.0;
+  private boolean isGettingBall = false;
+
+  int numbOfBalls;
+
+  int bottomSensorLock;
+  int topSensorLock;
 
   @Override
   public void robotInit() {
 
+
+//Init USB Camera Server For Streaming
     CameraServer.getInstance().startAutomaticCapture();
 
+
+
+//Set amount of time allowed for RAMP
     final double rampSeconds = 0.15;
+
+    //Set The Max Time allowed for mode OpenLoopRampRate
     _leftBackCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _leftFrontCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _rightBackCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _rightFrontCanSparkMax.setOpenLoopRampRate(rampSeconds);
     _shooterMotorLeft.setOpenLoopRampRate(rampSeconds);
     _shooterMotorRight.setOpenLoopRampRate(rampSeconds);
+    _collectVert.setOpenLoopRampRate(rampSeconds);
 
+
+//Set IDLE Modes for SparkMax's
     _leftBackCanSparkMax.setIdleMode(IdleMode.kCoast);
     _leftFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
     _rightBackCanSparkMax.setIdleMode(IdleMode.kCoast);
     _rightFrontCanSparkMax.setIdleMode(IdleMode.kCoast);
 
+
+//Add Colors For Color Matcher to Find
     m_colorMatcher.addColorMatch(kBlueTarget);
     m_colorMatcher.addColorMatch(kGreenTarget);
     m_colorMatcher.addColorMatch(kRedTarget);
@@ -151,6 +173,11 @@ public class Robot extends TimedRobot {
 
     SmartDashboard.putNumber("Left Encoder_Graph", leftBack_encoder.getPosition());
     SmartDashboard.putNumber("Right Encoder_Graph", rightBack_encoder.getPosition());
+
+    SmartDashboard.putBoolean("BottomSensor", bottomSensor.get());
+
+    SmartDashboard.putBoolean("TopSensor", topSensor.get());
+
 
     Color detectedColor = m_colorSensor.getColor();
     String colorString;
@@ -221,95 +248,185 @@ public class Robot extends TimedRobot {
     speedToggle = false;
     Update_Limelight_Tracking();
     limelightTracking(false);
+    numbOfBalls = 0;
+    bottomSensorLock = 1;
+    topSensorLock = 1;
   }
 
   @Override
   public void teleopPeriodic() {
     buttonToggles();
 
-    double collectorDirection = -_joystick1.getRawAxis(3);
+    
     double deadzone = 0.3;
     double tx = NetworkTableInstance.getDefault().getTable("limelight").getEntry("tx").getDouble(0);
-    double _joyforwardRaw = -_joystick1.getY();
-    double _joyrotateRaw = _joystick1.getZ();
-    double _joyforward;
-    double _joyrotate;
+  
+//Get left and right Joysticks and invert it 
 
-    if (_joyforwardRaw > deadzone || _joyforwardRaw < -deadzone) {
-      _joyforward = _joyforwardRaw;
-    }
+  double _leftjoyforwardRaw = -_joystick1.getRawAxis(1);
+  double _rightsidejoysideRaw = _joystick1.getRawAxis(4);
+      SmartDashboard.putNumber("Raw1", _leftjoyforwardRaw);    
+   SmartDashboard.putNumber("Raw4", _rightsidejoysideRaw);    
 
-    if (_joyrotateRaw > deadzone || _joyrotateRaw < -deadzone) {
-      _joyrotate = _joyrotateRaw;
-    }
+    
 
-    double forward2 = _joyforwardRaw * _joyforwardRaw * (_joyforwardRaw < 0 ? -1.0 : 1.0);
-    double rotate2 = 0.5 * (_joyrotateRaw * _joyrotateRaw * (_joyrotateRaw < 0 ? -1.0 : 1.0));
-
-    // SmartDashboard.putNumber("Left Drive", drive_left);
-    // SmartDashboard.putNumber("Right Drive", drive_right);
+    double forward = (_leftjoyforwardRaw * 0.5);
+    double rotate = (_rightsidejoysideRaw * 0.5);
 
     if (_joystick1.getRawButton(3)) {
       limelightAutonomous();
     }
-
-    m_Drive.arcadeDrive(forward2, rotate2, false);
-
-    // Lifting
-    Boolean liftUp = _joystick1.getRawButton(4);
-    Boolean liftDown = _joystick1.getRawButton(6);
-    double lifterDir = liftDown ? 1 : -1;
-    // If you press liftDown or liftUp at the same time, or neither at the same
-    // time, set lifting diretion to 0.
-
-    _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4 * lifterDir) : 0.0);
-
-    // For gathering
-    // Read current from powerboard for shooter
-    // Trigger + Thumb = Shooting
-    // Thumb = Magazine loading
-    // Trigger = Collector
-    // Direction
-    // Down
-    boolean collectorButton = _joystickco.getRawButton(1);
-    boolean magazineAll_co = _joystickco.getRawButton(3);
-    boolean bottom_mag_co = _joystickco.getRawButton(5);
-    boolean topMag_co = _joystickco.getRawButton(6);
-    boolean maindriver_trigger = _joystick1.getRawButton(1);
-    boolean mainDriver_thumbButton = _joystick1.getRawButton(2);
-
-    // -1 == Reverse direction of collector
-    double directionMultiplier = collectorDirection > 0.0 ? 1.0 : -1.0;
-
-    collectorOn(collectorButton, collectorDirection < 0.0);
-
-    // If bottoom is false, then 0, if true, -1
-
-    Boolean isShooting = maindriver_trigger && mainDriver_thumbButton;
-    if (isShooting && !wasShooting) {
-      startShooterTimer();
-    }
-    wasShooting = isShooting;
-    Boolean feedShooter = isShooting && shooterTimer.hasElapsed(0.5);
-    final double shootPower = directionMultiplier * -0.9;
-    _shooterMotorLeft.set(isShooting ? -shootPower : 0.0);
-    _shooterMotorRight.set(isShooting ? shootPower : 0.0);
-
-    _magMotor1.set((feedShooter || bottom_mag_co) ? 1 * directionMultiplier : 0);
-    _magMotor2.set(feedShooter || topMag_co || collectorButton ? -1 * directionMultiplier : 0);
-
-    if (_joystick1.getRawButton(5)) {
-      _colorWheelTalon.set(ControlMode.PercentOutput, 1);
-    }
-
-    else if (_joystick1.getRawButton(3)) {
-      _colorWheelTalon.set(ControlMode.PercentOutput, -1);
-    }
-
     else {
-      _colorWheelTalon.set(ControlMode.PercentOutput, 0);
+      ledEntry.setDouble(1);
+      camMode.setDouble(1);
     }
+
+    m_Drive.arcadeDrive(forward, ((forward < -0.1 || forward > 0.1) ? rotate*1.5 : rotate), false);
+
+    // Lifting and collecting
+    //Set Buttons
+
+    boolean collectorButton = _joystick1.getRawButton(5); //Left Shoulder
+      boolean shooterButton = _joystick1.getRawButton(6); //Right Trigger (Is float, not bool)
+
+  int dpadDir = _joystick1.getPOV(0);
+
+    Boolean liftUp = (dpadDir == 0) ? true : false; //ADD DPAD UP
+    Boolean liftDown = (dpadDir == 180) ? true : false; //ADD DPAD DOWN
+    SmartDashboard.putNumber("DPadDir", dpadDir);    
+  //Tell motor what to do
+
+    // _liftmotor.set(ControlMode.PercentOutput, (liftDown ^ liftUp) ? (0.4) : 0.0);
+  if (liftUp) {
+    _liftmotor.set(ControlMode.PercentOutput, 0.4);
   }
+  else if (liftDown) {
+   _liftmotor.set(ControlMode.PercentOutput, -0.4);
+   } 
+   else {
+     _liftmotor.set(ControlMode.PercentOutput, 0.0);
+  }
+  
+
+
+      // For gathering
+      // Read current from powerboard for shooter
+      // Right Trigger Shooting
+      // Collector Left Shoulder
+
+        //Top and bottom parts of collector, plus if balls should be collected 
+        //WILL be handled by retroreflective sensors! 
+      
+        //Add collector Logic
+
+        if (collectorButton) {
+
+      if (bottomSensorLock == 0 && !bottomSensor.get()) {
+        numbOfBalls ++;
+        bottomSensorLock = 1;
+        isGettingBall = true;
+      }
+      else if (bottomSensorLock == 1 && bottomSensor.get()) {
+        bottomSensorLock = 0;
+        isGettingBall = false;
+      }
+    
+
+      if (topSensorLock == 0 && topSensor.get()) {
+        numbOfBalls --;
+        topSensorLock = 1;
+      }
+      else if (topSensorLock == 1 && !topSensor.get()) {
+        topSensorLock = 0;
+      }
+
+  //Now do the ball collecting logic for running through the carage feed
+
+        if (numbOfBalls < 0) {
+                  System.out.println("Collector Has Negative Balls");
+        }
+        else if (numbOfBalls > 5) {
+                  System.out.println("More Then five Balls");
+        }
+
+        //When collecting and balls are zero, run bottom collector only, if one then run both.
+
+      if (numbOfBalls == 0) {
+        _magMotor1.set(-0.4);
+      }
+      else if (numbOfBalls >= 1 && topSensor.get()) {
+        _magMotor1.set(-0.4);
+        _magMotor2.set(0.4);
+      }
+      else if (numbOfBalls >= 1 && !topSensor.get()){
+                _magMotor1.set(-0.4);
+                _magMotor2.set(0);
+      }
+        else {
+        _magMotor1.set(0);
+        _magMotor2.set(0);
+        }
+  }
+
+else {
+        _magMotor1.set(0);
+        _magMotor2.set(0);
+        }
+
+        if (shooterButton && !collectorButton) {
+        _shooterMotorLeft.set(-0.8);
+        _shooterMotorRight.set(0.8);
+                _magMotor2.set(0.4);
+        }
+      else if (!shooterButton && !collectorButton) {
+        _shooterMotorLeft.set(0);
+        _shooterMotorRight.set(0);
+        _magMotor2.set(0);
+      }
+
+
+        
+
+        SmartDashboard.putNumber("Amount Of Balls In", numbOfBalls);
+        SmartDashboard.putNumber("bottomSensorLock", bottomSensorLock);        
+        SmartDashboard.putBoolean("isGettingBall", isGettingBall);
+
+    
+        
+      if (collectorButton) {
+        _ColectorMotor.set(ControlMode.PercentOutput, -0.5);
+        _collectVert.set(-0.5);
+
+      
+
+      }
+      else {
+        _ColectorMotor.set(ControlMode.PercentOutput, 0.0);
+       _collectVert.set(0.0);
+      }
+
+    if (shooterButton) {
+      startShooterTimer(); //<---- Investigate WHAT IS ShooterTimer?
+    }
+    
+    
+    
+    
+
+  } 
+
+  //   if (_joystick1.getRawButton(5)) {
+  //     _colorWheelTalon.set(ControlMode.PercentOutput, 1);
+  //   }
+
+  //   else if (_joystick1.getRawButton(3)) {
+  //     _colorWheelTalon.set(ControlMode.PercentOutput, -1);     <--- No Clue What ANY of this did.
+  //   }
+
+  //   else {
+  //     _colorWheelTalon.set(ControlMode.PercentOutput, 0);
+  //   }
+  // }
 
   public void Update_Limelight_Tracking() {
     // These numbers must be tuned for your Robot! Be careful!
@@ -545,3 +662,4 @@ public class Robot extends TimedRobot {
   }
 
 }
+
